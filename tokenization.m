@@ -1,38 +1,42 @@
-vocabulary = [" ", "^", "&", "?", "C", "N", "(", ")", "c", "1", "n", "2", "-", "Cl", "=", "O", "Br", "[", "+", "]", "s", "F", "#", "S", "H", "3"]
+vocabulary = [' ', '^', '&', '?', 'C', 'N', '(', ')', 'c', '1', 'n', '2', '-', 'Cl', '=', 'O', 'Br', '[', '+', ']', 's', 'F', '#', 'S', 'H', '3'];
+% Melhorias:
+% usar dicionario!
+% buscar bd de smiles para usar no vocabulay!
 
-smiles = input("Digite o valor a ser codificado: ", "s");
+file_name = 'test_smiles_menos.txt';
 
-encoded = zeros(1, length(smiles));
+arquivo = fopen(file_name, 'r');
 
-for k = 1:length(smiles)
-    current_char = smiles(k);
-    for i = 1:length(vocabulary)
-        if vocabulary(i) == smiles(k)
-            encoded(k) = i;
+if arquivo == -1
+    error('Não foi possível abrir o arquivo.');
+end
+
+linha = fgetl(arquivo); % fgetl le a proxima linha do arquivo
+smiles = [];
+
+while linha ~= -1
+    smiles = [smiles; string(linha)];
+    linha = fgetl(arquivo);
+end
+
+fclose(arquivo);    
+
+
+tamanho = size(char(smiles));
+encoded = zeros(size(smiles));
+
+for k = 1:tamanho(1)    
+    for j = 1:tamanho(2)
+        current_char = char(smiles(k));
+        for i = 1:length(vocabulary)
+            try
+                if vocabulary(i) == current_char(1,j)
+                    encoded(k,j) = i-1;
+                    break;
+                end
+            catch
+                encoded(k,j) = NaN;
+            end
         end
     end
 end
-
-disp(encoded);
-
-
-%{
-smiles = input("Digite o valor a ser codificado: ", "s");
-
-vocabulary = dictionary({" ", "^", "&", "?", "C", "N", "(", ")", "c", "1", "n", "2", "-", "Cl", "=", "O", "Br", "[", "+", "]", "s", "F", "#", "S", "H", "3"},0:25);
-
-encoded = zeros(1,length(smiles));
-
-for k = 1:length(smiles)
-    current_char = smiles(k);
-        
-    if isKey(vocabulary, current_char)
-        encoded = [encoded, vocabulary(current_char)];
-    end
-end
-
-disp(vocabulary.keys);
-disp(vocabulary.values);
-
-disp(encoded);
-%}
